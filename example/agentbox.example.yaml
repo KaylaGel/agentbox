@@ -1,0 +1,31 @@
+agents:
+  worker:
+    command:
+    - python
+    - -c
+    - print('hello from an isolated agent')
+    egress: []
+    env: {}
+    image: python:3.12-slim
+    limits:
+      cpus: 1.0
+      memory: 1g
+      pids: 256
+      ttl_minutes: 30
+    workspace: ./workspace
+hardening:
+  drop_all_capabilities: true
+  no_new_privileges: true
+  non_root: true
+  read_only_rootfs: true
+model:
+  api_base: http://host.docker.internal:11434
+  api_key_file: null
+  model: qwen3:8b
+  provider: ollama
+project: demo
+tools:
+  allow_docker_socket: true
+  mcp_servers:
+  - duckduckgo
+version: 1

@@ -1,0 +1,16 @@
+[project]
+name = "agentbox"
+version = "0.1.0"
+description = "Spin up LLM-agnostic AI agents in hardened, network-isolated Docker containers."
+requires-python = ">=3.10"
+dependencies = ["typer>=0.12", "pydantic>=2.5", "pyyaml>=6.0"]
+
+[project.scripts]
+agentbox = "agentbox.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["agentbox*"]

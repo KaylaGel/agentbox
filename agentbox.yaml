@@ -1,0 +1,45 @@
+version: 1
+project: my-agents
+
+# ── LLM (swap providers freely — agents never know the difference) ──────────
+# Every agent talks to an OpenAI-compatible LiteLLM proxy sidecar.
+# provider can be: anthropic | openai | gemini | groq | bedrock | azure |
+#                  ollama | openai_compatible (Docker Model Runner, vLLM, ...)
+model:
+  provider: openai
+  model: gpt-5.1
+  api_key_file: .agentbox/secrets/llm_api_key   # file, never an env var
+  budget_usd: 25          # hard cap enforced at the proxy
+  budget_duration: 30d
+  rpm: 60
+
+# ── Tools via MCP gateway (optional) ─────────────────────────────────────────
+tools:
+  mcp_servers: []          # e.g. [duckduckgo, fetch]
+  allow_docker_socket: false
+
+# ── Agents ───────────────────────────────────────────────────────────────────
+agents:
+  worker:
+    image: python:3.12-slim
+    command: ["python", "/workspace/summarise.py"]
+    role: >-
+      You are a research analyst. Summarise the articles you are given as
+      concise bullet points (one per article, with the link), grouped by
+      theme where it helps.
+    workspace: ./workspace
+    limits:
+      cpus: 1.0
+      memory: 1g
+      pids: 256
+      ttl_minutes: 30
+    # Allowed websites beyond the LLM proxy / MCP gateway — enforced by a
+    # per-agent allowlist proxy sidecar. Empty = no direct egress at all.
+    egress: [www.bleepingcomputer.com]
+
+# ── Container hardening (sane defaults, override only if you must) ──────────
+hardening:
+  non_root: true
+  read_only_rootfs: true
+  drop_all_capabilities: true
+  no_new_privileges: true
